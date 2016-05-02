@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="background:yellow;">
+<html>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="format-detection" content="telephone=no" />
@@ -370,30 +370,37 @@
 		
 		
 		
-		
 
   <script>
       // Note: This example requires that you consent to location sharing when
       // prompted by your browser. If you see the error "The Geolocation service
       // failed.", it means you probably did not give permission for the browser to
       // locate you.
+      
+      var pos = {lat: -34.397, lng: 150.644};
+      var map = null;
+      var infoWindow = null;
 
       function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
+        
+        //google.maps.event.trigger(map, 'resize');
+        alert(pos.lat + " " + pos.lng);
+        
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: pos,
           zoom: 18
         });
-        var infoWindow = new google.maps.InfoWindow({map: map});
-        
-        google.maps.event.trigger(map, 'resize');
+        infoWindow = new google.maps.InfoWindow({map: map});
 
         // Try HTML5 geolocation.
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
-            var pos = {
+            pos = {
               lat: position.coords.latitude,
               lng: position.coords.longitude
             };
+            
+            
 
             infoWindow.setPosition(pos);
             infoWindow.setContent('You have parked here.');
@@ -416,7 +423,27 @@
       
       function refreshMap()
       {
-      	if (location.hash.substr(1) === "map") google.maps.event.trigger(map, 'resize');
+      	if (location.hash.substr(1) === "map")
+      	{
+      		setTimeout(function() {
+      			if (localStorage.getItem("carlocation") === null) {
+	      			// First time, want to set the location
+	      			 window.localStorage.setItem("carlocation",pos);
+	      		}
+	      		else {
+	      			// Returning to the map, so want to get the users loccation.
+	      			   pos = window.localStorage.getItem("carlocation");
+	      		}
+	      		
+	      		alert(".");
+	      		alert(JSON.stringify(infoWindow));
+	      		
+      		        infoWindow.setPosition(pos);
+		        infoWindow.setContent('You have parked here.');
+    		        map.setCenter(pos);
+      			google.maps.event.trigger(map, 'resize');
+      		}, 500);
+      	}
       }
     </script>
     <script async defer
